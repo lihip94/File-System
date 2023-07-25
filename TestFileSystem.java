@@ -14,5 +14,13 @@ public class TestFileSystem {
 
         System.out.println("Size of 'data.csv': " + fileSystem.getFileSize("data.csv"));
         System.out.println("Biggest file: " + fileSystem.getBiggestFile().name);
+
+        // Deleting a file named "report.txt"
+        fileSystem.delete("report.txt");
+
+        // Deleting a directory named "Projects"
+        fileSystem.delete("Projects");
+
+        fileSystem.showFileSystem();
     }
 }

@@ -1,34 +1,5 @@
-import java.util.*;
-
 class FileSystem {
     private static final int MAX_NAME_LENGTH = 32;
-
-    class File {
-        String name;
-        long size;
-        Date creationDate;
-
-        File(String name, long size) {
-            this.name = name;
-            this.size = size;
-            this.creationDate = new Date();
-        }
-    }
-
-    class Directory {
-        String name;
-        Date creationDate;
-        List<File> files;
-        List<Directory> directories;
-
-        Directory(String name) {
-            this.name = name;
-            this.creationDate = new Date();
-            this.files = new ArrayList<>();
-            this.directories = new ArrayList<>();
-        }
-    }
-
     private Directory root;
 
     public FileSystem() {
@@ -103,6 +74,7 @@ class FileSystem {
         return -1;
     }
 
+    // File
     public long getFileSize(String fileName) {
         return getFileSize(root, fileName);
     }
@@ -139,5 +111,48 @@ class FileSystem {
     public void showFileSystem() {
         System.out.println("File System:");
         showFileSystem(root, "");
+    }
+
+    private boolean delete(Directory current, String name) {
+        for (int i = 0; i < current.files.size(); i++) {
+            File file = current.files.get(i);
+            if (file.name.equals(name)) {
+                current.files.remove(i);
+                return true;
+            }
+        }
+
+        for (int i = 0; i < current.directories.size(); i++) {
+            Directory dir = current.directories.get(i);
+            if (dir.name.equals(name)) {
+                current.directories.remove(i);
+                return true;
+            } else {
+                if (delete(dir, name)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean delete(String name) {
+        if (name.length() > MAX_NAME_LENGTH) {
+            System.out.println("Name is too long. Maximum length is 32 characters.");
+            return false;
+        }
+
+        if (name.equals("/")) {
+            System.out.println("Root directory cannot be deleted.");
+            return false;
+        }
+
+        if (!delete(root, name)) {
+            System.out.println("File or directory not found.");
+            return false;
+        }
+
+        return true;
     }
 }
