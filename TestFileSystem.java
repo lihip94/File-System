@@ -1,26 +1,59 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class TestFileSystem {
-    public static void main(String[] args) {
-        FileSystem fileSystem = new FileSystem();
+    private FileSystem fileSystem;
+
+    @BeforeEach
+    public void setup() {
+        fileSystem = new FileSystem();
+    }
+
+    @Test
+    public void testAddFile() {
         fileSystem.addDir("/", "Documents");
         fileSystem.addFile("Documents", "report.txt", 1024);
-        fileSystem.addFile("Documents", "image.jpg", 2048);
+        assertEquals(1024, fileSystem.getFileSize("report.txt"));
+    }
+
+    @Test
+    public void testAddDir() {
+        assertFalse(fileSystem.delete("Projects"));
         fileSystem.addDir("/", "Projects");
-        fileSystem.addFile("Projects", "app.exe", 4096);
-        fileSystem.addFile("Projects", "data.csv", 8192);
-        fileSystem.addDir("Projects", "Backup");
-        fileSystem.addFile("Backup", "backup.zip", 16384);
+        assertTrue(fileSystem.delete("Projects")); // Testing delete in this test
+    }
 
-        fileSystem.showFileSystem();
+    @Test
+    public void testGetFileSize() {
+        fileSystem.addFile("/", "file1.txt", 512);
+        fileSystem.addFile("/", "file2.txt", 1024);
 
-        System.out.println("Size of 'data.csv': " + fileSystem.getFileSize("data.csv"));
-        System.out.println("Biggest file: " + fileSystem.getBiggestFile().name);
+        assertEquals(512, fileSystem.getFileSize("file1.txt"));
+        assertEquals(1024, fileSystem.getFileSize("file2.txt"));
+    }
 
-        // Deleting a file named "report.txt"
-        fileSystem.delete("report.txt");
+    @Test
+    public void testGetBiggestFile() {
+        fileSystem.addFile("/", "file1.txt", 512);
+        fileSystem.addFile("/", "file2.txt", 1024);
+        fileSystem.addFile("/", "file3.txt", 256);
 
-        // Deleting a directory named "Projects"
-        fileSystem.delete("Projects");
+        assertEquals("file2.txt", fileSystem.getBiggestFile().name);
+    }
 
-        fileSystem.showFileSystem();
+    @Test
+    public void testDeleteFile() {
+        fileSystem.addFile("/", "file.txt", 512);
+        assertTrue(fileSystem.delete("file.txt"));
+        assertFalse(fileSystem.delete("file.txt")); // Verify it's deleted and cannot be deleted again
+    }
+
+    @Test
+    public void testDeleteDirectory() {
+        fileSystem.addDir("/", "TestDir");
+        assertTrue(fileSystem.delete("TestDir"));
+        assertFalse(fileSystem.delete("TestDir")); // Verify it's deleted and cannot be deleted again
     }
 }
