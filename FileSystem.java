@@ -20,30 +20,9 @@ class FileSystem {
     }
 
     /**
-     * Find and return the directory
-     * Complexity: O(N)
-     * N - the number of directorys in the file system
-     * 
-     * @param name The name of directory we seaching for.
-     **/
-    private Directory findDirectory(Directory current, String dirName) {
-        if (current.name.equals(dirName)) {
-            return current;
-        }
-
-        for (Directory dir : current.directories) {
-            Directory foundDir = findDirectory(dir, dirName);
-            if (foundDir != null) {
-                return foundDir;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Adds a new file with the specified name and size to the given parent
      * directory.
-     * Complexity: O(N + M)
+     * Complexity: O(1)
      * 
      * @param parentDirName The name of the parent directory where the file will be
      *                      added.
@@ -65,19 +44,19 @@ class FileSystem {
 
         }
 
-        Directory parentDir = findDirectory(root, parentDirName);
+        Object parentDir = namesInFileSystem.get(parentDirName);
         if (parentDir == null) {
             throw new IllegalArgumentException("Parent directory not found.");
         }
 
         File newFile = new File(fileName, fileSize);
-        parentDir.files.add(newFile);
+        ((Directory) parentDir).files.add(newFile);
         namesInFileSystem.put(fileName, newFile);
     }
 
     /**
      * Adds a new directory with the specified name to the given parent directory.
-     * Complexity: O(N + M)
+     * Complexity: O(1))
      *
      * @param parentDirName The name of the parent directory where the directory
      *                      will be added.
@@ -94,49 +73,27 @@ class FileSystem {
                     "Directory name is not valid. Directory with the same name already exists.");
         }
 
-        Directory parentDir = findDirectory(root, parentDirName);
+        Object parentDir = namesInFileSystem.get(parentDirName);
         if (parentDir == null) {
             throw new IllegalArgumentException("Parent directory not found.");
         }
 
         Directory newDir = new Directory(dirName);
-        parentDir.directories.add(newDir);
+        ((Directory) parentDir).directories.add(newDir);
         namesInFileSystem.put(dirName, newDir);
     }
 
     /**
-     * Fet the file size
-     * Complexity: O(N + M)
-     * 
-     * @param current  The name of the parent directory (inital root)
-     * @param fileName The name of the file
-     * 
-     */
-    private long getFileSize(Directory current, String fileName) {
-        for (File file : current.files) {
-            if (file.name.equals(fileName)) {
-                return file.size;
-            }
-        }
-
-        for (Directory dir : current.directories) {
-            long size = getFileSize(dir, fileName);
-            if (size != -1) {
-                return size;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
      * Get the file size
+     * Complexity: O(1)
      * 
      * @param fileName The name of the file
      * 
      */
     public long getFileSize(String fileName) {
-        return getFileSize(root, fileName);
+        Object currentFile = namesInFileSystem.get(fileName);
+        long fileSize = ((File) currentFile).size;
+        return fileSize;
     }
 
     /**
