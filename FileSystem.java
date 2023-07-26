@@ -100,10 +100,11 @@ class FileSystem {
     }
 
     private void showFileSystem(Directory current, String indent) {
-        System.out.println(indent + "|-- " + current.name + " (Dir)");
+        System.out.println(indent + "|-- " + current.name + " (Dir, Creation Date: " + current.creationDate + ")");
         indent += "   ";
         for (File file : current.files) {
-            System.out.println(indent + "|-- " + file.name + " (File, Size: " + file.size + ")");
+            System.out.println(indent + "|-- " + file.name + " (File, Size: " + file.size + ", Creation Date: "
+                    + file.creationDate + ")");
         }
         for (Directory dir : current.directories) {
             showFileSystem(dir, indent);
