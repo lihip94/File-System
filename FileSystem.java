@@ -29,19 +29,17 @@ class FileSystem {
 
     public void addFile(String parentDirName, String fileName, long fileSize) {
         if (fileName.length() > MAX_NAME_LENGTH) {
-            System.out.println("File name is too long. Maximum length is 32 characters.");
-            return;
+            throw new IllegalArgumentException("File name is too long. Maximum length is 32 characters.");
         }
 
         if (fileSize <= 0) {
-            System.out.println("File size not valid. Size file must be positive number");
-            return;
+            throw new IllegalArgumentException("File size not valid. Size file must be positive number");
+
         }
 
         Directory parentDir = findDirectory(root, parentDirName);
         if (parentDir == null) {
-            System.out.println("Parent directory not found.");
-            return;
+            throw new IllegalArgumentException("Parent directory not found.");
         }
 
         File newFile = new File(fileName, fileSize);
@@ -50,14 +48,12 @@ class FileSystem {
 
     public void addDir(String parentDirName, String dirName) {
         if (dirName.length() > MAX_NAME_LENGTH) {
-            System.out.println("Directory name is too long. Maximum length is 32 characters.");
-            return;
+            throw new IllegalArgumentException("Directory name is too long. Maximum length is 32 characters.");
         }
 
         Directory parentDir = findDirectory(root, parentDirName);
         if (parentDir == null) {
-            System.out.println("Parent directory not found.");
-            return;
+            throw new IllegalArgumentException("Parent directory not found.");
         }
 
         Directory newDir = new Directory(dirName);
@@ -144,19 +140,12 @@ class FileSystem {
     }
 
     public boolean delete(String name) {
-        if (name.length() > MAX_NAME_LENGTH) {
-            System.out.println("Name is too long. Maximum length is 32 characters.");
-            return false;
-        }
-
         if (name.equals("/")) {
-            System.out.println("Root directory cannot be deleted.");
-            return false;
+            throw new IllegalArgumentException("Root directory cannot be deleted.");
         }
 
         if (!delete(root, name)) {
-            System.out.println("File or directory not found.");
-            return false;
+            throw new IllegalArgumentException("File or directory not found.");
         }
 
         return true;

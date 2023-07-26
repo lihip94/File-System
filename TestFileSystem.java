@@ -12,17 +12,57 @@ public class TestFileSystem {
     }
 
     @Test
-    public void testAddFile() {
+    public void testAddFileSuccessfully() {
         fileSystem.addDir("/", "Documents");
         fileSystem.addFile("Documents", "report.txt", 1024);
         assertEquals(1024, fileSystem.getFileSize("report.txt"));
     }
 
     @Test
-    public void testAddDir() {
-        assertFalse(fileSystem.delete("Projects"));
+    public void testAddFileWithInvalidName() {
+        // Attempt to add a file with a name longer than the allowed limit(32characters)
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addFile("/", "ThisFileNameIsTooLongForTheLimit.txt", 1024));
+        assertEquals("File name is too long. Maximum length is 32 characters.", exception.getMessage());
+    }
+
+    @Test
+    public void testAddFileWithNegativeSize() {
+        // Attempt to add a file with a negative size
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addFile("/", "file.txt", -1024));
+        assertEquals("File size not valid. Size file must be positive number", exception.getMessage());
+    }
+
+    @Test
+    public void testAddFileToNonExistsParanetDir() {
+        // Attempt to add a file to non exists directory
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addFile("FakeDir", "file.txt", 512));
+        assertEquals("Parent directory not found.", exception.getMessage());
+    }
+
+    @Test
+    public void testAddDirSuccessfully() {
+        assertThrows(IllegalArgumentException.class, () -> fileSystem.delete("Projects"));
         fileSystem.addDir("/", "Projects");
-        assertTrue(fileSystem.delete("Projects")); // Testing delete in this test
+        // Testing delete in this test sccueded after adding
+        assertTrue(fileSystem.delete("Projects"));
+    }
+
+    @Test
+    public void testAddDirWithInvalidName() {
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addDir("/", "ThisDirectoryNameIsTooLongForTheLimit"));
+        assertEquals("Directory name is too long. Maximum length is 32 characters.", exception.getMessage());
+
+    }
+
+    @Test
+    public void testAddDirtoNonExistsParanetDir() {
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addDir("FakeDir", "RealDir"));
+        assertEquals("Parent directory not found.", exception.getMessage());
     }
 
     @Test
@@ -44,16 +84,32 @@ public class TestFileSystem {
     }
 
     @Test
-    public void testDeleteFile() {
+    public void testDeleteFileSuccessfully() {
         fileSystem.addFile("/", "file.txt", 512);
         assertTrue(fileSystem.delete("file.txt"));
-        assertFalse(fileSystem.delete("file.txt")); // Verify it's deleted and cannot be deleted again
+        // file cannot be deleted again
+        assertThrows(IllegalArgumentException.class, () -> fileSystem.delete("file.txt"));
+    }
+
+    @Test
+    public void testDeleteDirectorySuccessfully() {
+        fileSystem.addDir("/", "TestDir");
+        assertTrue(fileSystem.delete("TestDir"));
+        // dir cannot be deleted again
+        assertThrows(IllegalArgumentException.class, () -> fileSystem.delete("TestDir"));
+    }
+
+    @Test
+    public void testDeleteRootDirectory() {
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.delete("/"));
+        assertEquals("Root directory cannot be deleted.", exception.getMessage());
     }
 
     @Test
     public void testDeleteDirectory() {
-        fileSystem.addDir("/", "TestDir");
-        assertTrue(fileSystem.delete("TestDir"));
-        assertFalse(fileSystem.delete("TestDir")); // Verify it's deleted and cannot be deleted again
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.delete("FakeName"));
+        assertEquals("File or directory not found.", exception.getMessage());
     }
 }
