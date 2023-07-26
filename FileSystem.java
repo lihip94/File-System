@@ -1,7 +1,14 @@
+/**
+ * Represents a file system that manages files and directories.
+ */
 class FileSystem {
+
     private static final int MAX_NAME_LENGTH = 32;
     private Directory root;
 
+    /**
+     * Constructs a new FileSystem object with a root directory ("/").
+     */
     public FileSystem() {
         root = new Directory("/");
     }
@@ -74,7 +81,6 @@ class FileSystem {
         return -1;
     }
 
-    // File
     public long getFileSize(String fileName) {
         return getFileSize(root, fileName);
     }
