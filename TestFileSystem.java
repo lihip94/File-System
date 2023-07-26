@@ -30,9 +30,9 @@ public class TestFileSystem {
     public void testAddFileWithExistingName() {
         // Attempt to add a file with a name that exist in the file system
         fileSystem.addDir("/", "Documents");
-        fileSystem.addFile("Documents", "report.txt", 1024);
+        fileSystem.addFile("Documents", "OldName.txt", 1024);
         Throwable exception = assertThrows(IllegalArgumentException.class,
-                () -> fileSystem.addFile("/", "report.txt", 1024));
+                () -> fileSystem.addFile("/", "OldName.txt", 1024));
         assertEquals("File name is not valid. File with the same name already exists.", exception.getMessage());
     }
 

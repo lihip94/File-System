@@ -1,3 +1,6 @@
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 /**
  * Represents a file system that manages files and directories.
  */
@@ -5,12 +8,15 @@ class FileSystem {
 
     private static final int MAX_NAME_LENGTH = 32;
     private Directory root;
+    private Dictionary<String, Object> namesInFileSystem;
 
     /**
      * Constructs a new FileSystem object with a root directory ("/").
      */
     public FileSystem() {
         root = new Directory("/");
+        namesInFileSystem = new Hashtable<>();
+        namesInFileSystem.put("/", root);
     }
 
     /**
@@ -35,28 +41,6 @@ class FileSystem {
     }
 
     /**
-     * Checks if the name exist in the file system.
-     * Complexity: O(N + M)
-     * N - the number of directorys in the file system
-     * M - the number of files in the file system
-     * 
-     * @param current The directory that we check in.
-     * @param name    The name of the file or directory.
-     **/
-    private boolean NameExist(Directory current, String name) {
-        if (current.name.equals(name))
-            return true;
-
-        for (File file : current.files)
-            if (file.name.equals(name))
-                return true;
-
-        for (Directory dir : current.directories)
-            return NameExist(dir, name);
-        return false;
-    }
-
-    /**
      * Adds a new file with the specified name and size to the given parent
      * directory.
      * Complexity: O(N + M)
@@ -73,11 +57,9 @@ class FileSystem {
             throw new IllegalArgumentException("File name is too long. Maximum length is 32 characters.");
         }
 
-        if (NameExist(root, fileName)) {
+        if (namesInFileSystem.get(fileName) != null) {
             throw new IllegalArgumentException("File name is not valid. File with the same name already exists.");
-
         }
-
         if (fileSize <= 0) {
             throw new IllegalArgumentException("File size not valid. Size file must be positive number");
 
@@ -90,6 +72,7 @@ class FileSystem {
 
         File newFile = new File(fileName, fileSize);
         parentDir.files.add(newFile);
+        namesInFileSystem.put(fileName, newFile);
     }
 
     /**
@@ -106,10 +89,9 @@ class FileSystem {
             throw new IllegalArgumentException("Directory name is too long. Maximum length is 32 characters.");
         }
 
-        if (NameExist(root, dirName)) {
+        if (namesInFileSystem.get(dirName) != null) {
             throw new IllegalArgumentException(
                     "Directory name is not valid. Directory with the same name already exists.");
-
         }
 
         Directory parentDir = findDirectory(root, parentDirName);
@@ -119,6 +101,7 @@ class FileSystem {
 
         Directory newDir = new Directory(dirName);
         parentDir.directories.add(newDir);
+        namesInFileSystem.put(dirName, newDir);
     }
 
     /**
