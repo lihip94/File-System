@@ -27,9 +27,27 @@ class FileSystem {
         return null;
     }
 
+    private boolean NameExist(Directory current, String name) {
+        if (current.name.equals(name))
+            return true;
+
+        for (File file : current.files)
+            if (file.name.equals(name))
+                return true;
+
+        for (Directory dir : current.directories)
+            return NameExist(dir, name);
+        return false;
+    }
+
     public void addFile(String parentDirName, String fileName, long fileSize) {
         if (fileName.length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException("File name is too long. Maximum length is 32 characters.");
+        }
+
+        if (NameExist(root, fileName)) {
+            throw new IllegalArgumentException("File name is not valid. File with the same name already exists.");
+
         }
 
         if (fileSize <= 0) {
@@ -49,6 +67,12 @@ class FileSystem {
     public void addDir(String parentDirName, String dirName) {
         if (dirName.length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException("Directory name is too long. Maximum length is 32 characters.");
+        }
+
+        if (NameExist(root, dirName)) {
+            throw new IllegalArgumentException(
+                    "Directory name is not valid. Directory with the same name already exists.");
+
         }
 
         Directory parentDir = findDirectory(root, parentDirName);

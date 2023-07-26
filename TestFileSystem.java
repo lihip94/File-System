@@ -27,6 +27,16 @@ public class TestFileSystem {
     }
 
     @Test
+    public void testAddFileWithExistingName() {
+        // Attempt to add a file with a name that exist in the file system
+        fileSystem.addDir("/", "Documents");
+        fileSystem.addFile("Documents", "report.txt", 1024);
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addFile("/", "report.txt", 1024));
+        assertEquals("File name is not valid. File with the same name already exists.", exception.getMessage());
+    }
+
+    @Test
     public void testAddFileWithNegativeSize() {
         // Attempt to add a file with a negative size
         Throwable exception = assertThrows(IllegalArgumentException.class,
@@ -56,6 +66,16 @@ public class TestFileSystem {
                 () -> fileSystem.addDir("/", "ThisDirectoryNameIsTooLongForTheLimit"));
         assertEquals("Directory name is too long. Maximum length is 32 characters.", exception.getMessage());
 
+    }
+
+    @Test
+    public void testAddDirWithExistingName() {
+        // Attempt to add a file with a name that exist in the file system
+        fileSystem.addDir("/", "Documents");
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fileSystem.addDir("/", "Documents"));
+        assertEquals("Directory name is not valid. Directory with the same name already exists.",
+                exception.getMessage());
     }
 
     @Test
